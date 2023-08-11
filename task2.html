@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sayı Tahmin Oyunu</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sayı Tahmin Oyunu</h1>
+    <div>
+        <h2>Kullanıcı Tahminleri</h2>
+        <div id="tahminKutulari">
+            <input type="number" min="1" max="49" data-tahmin-no="1">
+            <input type="number" min="1" max="49" data-tahmin-no="2">
+            <input type="number" min="1" max="49" data-tahmin-no="3">
+            <input type="number" min="1" max="49" data-tahmin-no="4">
+            <input type="number" min="1" max="49" data-tahmin-no="5">
+            <input type="number" min="1" max="49" data-tahmin-no="6">
+            <button id="tahminGirButton">Tahmin Gir</button>
+            <button id="kuraCekButton" class="hidden">Kurayı Çek</button>
+        </div>
+        <p id="tahminMesaji" class="hidden"></p>
+    </div>
+    <div>
+        <h2>Loto Sayıları</h2>
+        <div id="lotoSayilari"></div>
+    </div>
+    <div>
+        <h2>Bilinen Sayılar</h2>
+        <label id="bilinenSayilar"></label>
+        <p id="bilinenSayiAdeti"></p>
+    </div>
+
+    <script>
+        const tahminGirButton = document.getElementById("tahminGirButton");
+        const tahminMesaji = document.getElementById("tahminMesaji");
+        const kuraCekButton = document.getElementById("kuraCekButton");
+        const lotoSayilari = document.getElementById("lotoSayilari");
+        const bilinenSayilar = document.getElementById("bilinenSayilar");
+        const bilinenSayiAdeti = document.getElementById("bilinenSayiAdeti");
+        const tahminKutulari = document.querySelectorAll("#tahminKutulari input");
+        
+        tahminGirButton.addEventListener("click", () => {
+            tahminGirButton.disabled = true;
+            tahminKutulari.forEach(tahminKutusu => {
+                tahminKutusu.disabled = true;
+            });
+
+            const girilenTahminler = [];
+            tahminKutulari.forEach(tahminKutusu => {
+                const tahmin = parseInt(tahminKutusu.value);
+                if (!isNaN(tahmin) && tahmin >= 1 && tahmin <= 49) {
+                    girilenTahminler.push(tahmin);
+                }
+            });
+
+            if (girilenTahminler.length !== 6) {
+                tahminMesaji.textContent = "6 adet tahmin girilmelidir.";
+                tahminMesaji.classList.remove("hidden");
+                return;
+            }
+
+            const uniqueTahminler = new Set(girilenTahminler);
+            if (uniqueTahminler.size !== 6) {
+                tahminMesaji.textContent = "Aynı tahmin bir kez girilebilir.";
+                tahminMesaji.classList.remove("hidden");
+                return;
+            }
+
+            const sortedTahminler = Array.from(uniqueTahminler).sort((a, b) => a - b);
+            bilinenSayilar.textContent = "Bilinen Sayılar: " + sortedTahminler.join(", ");
+            bilinenSayiAdeti.textContent = "Bilinen Sayı Adeti: " + sortedTahminler.length;
+
+            const lotoSayiDizisi = Array.from({ length: 49 }, (_, i) => i + 1).filter(num => !sortedTahminler.includes(num));
+            const randomLotoSayilari = [];
+            for (let i = 0; i < 6; i++) {
+                const randomIndex = Math.floor(Math.random() * lotoSayiDizisi.length);
+                randomLotoSayilari.push(lotoSayiDizisi.splice(randomIndex, 1)[0]);
+            }
+
+            lotoSayilari.textContent = "Loto Sayıları: " + randomLotoSayilari.join(", ");
+        });
+    </script>
+</body>
+</html>
